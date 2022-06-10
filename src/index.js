@@ -1,23 +1,39 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { useState } from 'react';
 
-const Square = () => {
+const Square = (props) => {
+
   return (
-    <button className="square">
-    {/* TODO */}
-  </button>
+    <button className="square" onClick={
+      () => { props.onClick() }
+    }>
+      {props.value}
+    </button>
   )
 }
 
-const renderSquare = (i) => {
-  return (
-    <Square />
-  )
-}
 
 const Board = () => {
-  const status = 'Next player: X';
+  const [clicked, defineClicked] = useState(Array(9).fill(null));
+  const [xIsNext, defineNext] = useState(true);
+  const status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+  
+  const handleClick = (i) => {
+    defineClicked(clicked.slice());
+    /*clicked[i] = 'X';
+    defineClicked(clicked);*/
+    defineNext(!xIsNext);
+  }
+
+  const renderSquare = (i) => {
+    return (
+      <Square value={clicked[i]} onClick={
+      () => {handleClick(i)}
+      }/>
+    )
+  }
 
   return (
     <div>
