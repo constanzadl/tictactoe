@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { useState } from 'react';
+import { click } from '@testing-library/user-event/dist/click';
 
 const Square = (props) => {
 
@@ -18,13 +19,24 @@ const Square = (props) => {
 const Board = () => {
   const [clicked, defineClicked] = useState(Array(9).fill(null));
   const [xIsNext, defineNext] = useState(true);
-  const status = `Next player: ${xIsNext ? 'X' : 'O'}`;
-  
+  const winner = calculateWinner(clicked);
+
+  let status;
+  if (winner) {
+    status = `Winner: ${winner}`;
+  } else {
+    status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+  }
+
   const handleClick = (i) => {
+    if (calculateWinner(clicked) || clicked[i]) {
+      return;
+    }
     defineClicked(clicked.slice());
-    /*clicked[i] = 'X';
-    defineClicked(clicked);*/
+    defineClicked(clicked);
     defineNext(!xIsNext);
+    clicked[i] = xIsNext ? 'X' : 'O';
+    console.log(clicked)
   }
 
   const renderSquare = (i) => {
@@ -71,6 +83,25 @@ const Game = () => {
       )
 }
 
+const calculateWinner = (clicked) => {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (clicked[a] && clicked[a] === clicked[b] && clicked[a] === clicked[c]) {
+      return clicked[a];
+    }
+  }
+  return null;
+}
 
 // ========================================
 
