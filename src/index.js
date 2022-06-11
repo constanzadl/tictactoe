@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { useState } from 'react';
-import { click } from '@testing-library/user-event/dist/click';
 
 const Square = (props) => {
 
@@ -16,40 +15,18 @@ const Square = (props) => {
 }
 
 
-const Board = () => {
-  const [clicked, defineClicked] = useState(Array(9).fill(null));
-  const [xIsNext, defineNext] = useState(true);
-  const winner = calculateWinner(clicked);
-
-  let status;
-  if (winner) {
-    status = `Winner: ${winner}`;
-  } else {
-    status = `Next player: ${xIsNext ? 'X' : 'O'}`;
-  }
-
-  const handleClick = (i) => {
-    if (calculateWinner(clicked) || clicked[i]) {
-      return;
-    }
-    defineClicked(clicked.slice());
-    defineClicked(clicked);
-    defineNext(!xIsNext);
-    clicked[i] = xIsNext ? 'X' : 'O';
-    console.log(clicked)
-  }
+const Board = (props) => {
 
   const renderSquare = (i) => {
     return (
-      <Square value={clicked[i]} onClick={
-      () => {handleClick(i)}
+      <Square value={props.clicked[i]} onClick={
+      () => {props.onClick(i)}
       }/>
     )
   }
 
   return (
     <div>
-      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -70,13 +47,49 @@ const Board = () => {
 }
 
 const Game = () => {
+
+  const [next, setNext] = useState(true);
+  const [clicked, setClicked] = useState(Array(9).fill(null));
+  const [history, setHistory] = useState([{squares: Array(9).fill(null)}]);
+  const [current, setCurrent] = useState(null);
+
+  const winner = calculateWinner(clicked);
+
+  let status;
+  if (winner) {
+    status = `Winner: ${winner}`;
+  } else {
+    status = `Next player: ${next ? 'X' : 'O'}`;
+  }
+
+  console.log(history)
+  const handleClick = (i) => {
+    setCurrent(history[history.length - 1])
+    setClicked(clicked.slice());
+    if (calculateWinner(clicked) || clicked[i]) {
+      return;
+    }
+
+    setClicked(clicked);
+    clicked[i] = next ? 'X' : 'O';
+
+    setHistory(history.concat([{
+      squares: clicked,
+    }]));
+    setNext(!next);
+    
+  }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board 
+          clicked={clicked}
+          onClick={(i) => handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{status}</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
