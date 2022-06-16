@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { useState } from 'react';
@@ -49,20 +49,19 @@ const Board = (props) => {
 const Game = () => {
 
   const [next, setNext] = useState(true);
-  const [clicked, setClicked] = useState(Array(9).fill(null));
+  const [clickedSquares, setClickedSquares] = useState(Array(9).fill(null));
   const [history, setHistory] = useState([{squares: Array(9).fill(null)}]);
-  const [current, setCurrent] = useState(null);
-  const [stepNumber, setStepNumber] = useState(0)
-  const winner = calculateWinner(clicked);
-  setCurrent(history[stepNumber]);
+  const winner = calculateWinner(clickedSquares);
+  
   const jumpTo = (step) => {
-    setStepNumber(step);
     setNext((step % 2) === 0);
+    setHistory(history.slice(0, step + 1));
+    setClickedSquares(history[step + 1].squares.slice())
   }
 
   const moves = history.map((step, move) => {
     const desc = move ?
-    `Go to move #${move}` :
+    `Go to move #${move}`:
     `Go to game start`;
     return (
       <li key={move}>
@@ -70,7 +69,6 @@ const Game = () => {
       </li>
     )
   })
-
 
   let status;
   if (winner) {
@@ -80,28 +78,26 @@ const Game = () => {
   }
 
   const handleClick = (i) => {
-    setHistory(history.slice(0, stepNumber + 1))
-    setCurrent(history[history.length - 1])
-    const newGameState = clicked.slice();
-    if (calculateWinner(clicked) || clicked[i]) {
+    setClickedSquares(history[history.length - 1]);
+    const newGameState = clickedSquares.slice();
+
+    if (calculateWinner(clickedSquares) || clickedSquares[i]) {
       return;
     }
-    clicked[i] = next ? 'X' : 'O';
-    setClicked(clicked.slice())
-    setClicked(clicked);
+
+    clickedSquares[i] = next ? 'X' : 'O';
+    setClickedSquares(clickedSquares.slice());
     setHistory(history.concat([{
       squares: newGameState,
     }]));
-    setStepNumber(history.length);
     setNext(!next);
-    
   }
-
+console.log(clickedSquares);
     return (
       <div className="game">
         <div className="game-board">
           <Board 
-          clicked={clicked}
+          clicked={clickedSquares}
           onClick={(i) => handleClick(i)}
           />
         </div>
