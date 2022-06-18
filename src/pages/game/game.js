@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
+import React from 'react';
 import { useState } from 'react';
 import { Board } from './components/board';
 import { calculateWinner } from './components/winner';
